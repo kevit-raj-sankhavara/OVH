@@ -10,7 +10,7 @@ function flattenObject(obj) {
                 if (!flatObject.hasOwnProperty(x)) continue;
 
                 let property = i + '.' + x;
-                property = property.replace(/\.\d+\./g, '.');
+                // property = property.replace(/\.\d+\./g, '.');
 
                 if (!toReturn.hasOwnProperty(property) && (typeof flatObject[x]) === 'string' && (flatObject[x]).includes(".ovh.")) {
                     toReturn[property] = flatObject[x];
