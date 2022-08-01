@@ -1,16 +1,15 @@
-function flattenObject(obj) {
+function getOVHFieldInDocument(obj) {
     let toReturn = {};
 
     for (let i in obj) {
         if (!obj.hasOwnProperty(i)) continue;
 
         if ((typeof obj[i]) === 'object' && obj[i] !== null) {
-            let flatObject = flattenObject(obj[i]);
+            let flatObject = getOVHFieldInDocument(obj[i]);
             for (let x in flatObject) {
                 if (!flatObject.hasOwnProperty(x)) continue;
 
                 let property = i + '.' + x;
-                // property = property.replace(/\.\d+\./g, '.');
 
                 if (!toReturn.hasOwnProperty(property) && (typeof flatObject[x]) === 'string' && (flatObject[x]).includes(".ovh.")) {
                     toReturn[property] = flatObject[x];
@@ -24,8 +23,7 @@ function flattenObject(obj) {
 
     return toReturn;
 };
-
-module.exports = flattenObject;
+module.exports = getOVHFieldInDocument;
 
 
 

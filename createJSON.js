@@ -1,10 +1,10 @@
 const MongoClient = require('mongodb').MongoClient;
 const fs = require('fs');
-const flattenObject = require('./newFlatten');
+const flattenObject = require('./flatten');
 
 const url = 'mongodb://localhost:27017';
-console.log(new Date());
 async function create_OVH_JSON() {
+    console.log(new Date());
     const client = await MongoClient.connect(url, { useNewUrlParser: true })
         .catch(err => { console.log(err); });
 
@@ -12,7 +12,7 @@ async function create_OVH_JSON() {
         return;
     }
 
-    const db = client.db("staging-saas-botplatform");
+    const db = client.db("production-saas-botplatform");
     try {
         const collections = await db.listCollections().toArray();
 
@@ -44,15 +44,11 @@ async function create_OVH_JSON() {
         }
     } catch (err) {
         console.log(err);
-    }
-    finally {
-        // console.log(new Date());
+    } finally {
         client.close();
     }
 }
 
-create_OVH_JSON();
-
-
+module.exports = create_OVH_JSON;
 
 
