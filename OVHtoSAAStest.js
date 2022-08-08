@@ -11,17 +11,16 @@ const ovhtosaas = async () => {
     }
 
     const fields = [
-        "profileImage",
-        "notifications.data.profilePic",
+        "value",
     ];
 
 
-    const db = client.db("staging-saas-botplatform");
+    const db = client.db("production-saas-botplatform");
     // const collection = db.collection("users");
     console.log(new Date());
 
     for (let j = 0; j < fields.length; j++) {
-        const allDocs = await db.collection(collection).find({ [fields[j]]: { $regex: ".ovh.", $options: "i" } }).toArray();
+        const allDocs = await db.collection("userfis").find({ [fields[j]]: { $regex: /\.ovh\./, $options: "i" } }).toArray();
 
         for (let i = 0; i < allDocs.length; i++) {
             console.log("Updating USERS...");
@@ -32,12 +31,19 @@ const ovhtosaas = async () => {
                 const valuesArr = value.split("/");
                 const fileName = valuesArr[valuesArr.length - 1];
                 const saasUrl = `https://storage.de.cloud.SAAS.net/v1/AUTH_af63bf6fa3884c108ced5661b04a5426/stagcontainer/${fileName}`;
-                await collection.updateOne({ _id: allDocs[i]._id }, { $set: { [key]: saasUrl } });
+                await db.collection("userfis").updateOne({ _id: allDocs[i]._id }, { $set: { [key]: saasUrl } });
             }
         }
-    }
 
-    console.log(new Date());
+        const countOfDocumentFound = await db.collection("userfis").countDocuments({ "value": { $regex: /\.ovh\./, $options: 'i' } });
+        if (!countOfDocumentFound) {
+            continue;
+        }
+        const totalCount = await db.collection("userfis").estimatedDocumentCount();
+        console.log(`Found ${countOfDocumentFound} out of ${totalCount} in collection: userfis`);
+        // console.log(`Query: db.getCollection('${collection}').find(${JSON.stringify(finalQuery)})`);
+    }
+    console.log("Done ", new Date());
 }
 
 ovhtosaas();

@@ -1,12 +1,12 @@
 const MongoClient = require('mongodb').MongoClient;
 const url = 'mongodb://localhost:27017';
 const fs = require("fs");
-const getOVHFieldInDocument = require('./changeURL');
+const getOVHFieldInDocument = require('./getOVHkeys');
 const create_OVH_JSON = require('./createJSON');
 
 async function DoMigration(pattern) {
     // Creating JSON File
-    // await create_OVH_JSON();
+    await create_OVH_JSON();
 
     const client = await MongoClient.connect(url, { useNewUrlParser: true })
         .catch(err => { console.log(err); });
@@ -21,10 +21,10 @@ async function DoMigration(pattern) {
         // Fetching Data from JSON File
         let checkingJSON = fs.readFileSync("Filter.json");
         checkingJSON = JSON.parse(checkingJSON);
-        // return;
+
         const checkingQuery = { $regex: pattern, $options: 'i' };
 
-        console.log("**** Migration Started... ****", new Date());
+        console.log("**** MIGRATION STARTED ****", new Date());
         for (const collection of Object.keys(checkingJSON).filter(d => checkingJSON[d].length)) {
             const finalQuery = {
                 $or: checkingJSON[collection].map(field => {
@@ -33,12 +33,15 @@ async function DoMigration(pattern) {
             };
 
             // Updating url from "ovh" to "saas"
+            // START
             console.log(`Updating ${collection}...`);
 
             const fields = checkingJSON[collection];
+            // Checking for all Fields which includes OVH
             for (let j = 0; j < fields.length; j++) {
-                const allDocs = await db.collection(collection).find({ [fields[j]]: { $regex: ".ovh.", $options: "i" } }).toArray();
+                const allDocs = await db.collection(collection).find({ [fields[j]]: { $regex: pattern, $options: "i" } }).toArray();
 
+                // Updating document one by one
                 for (let i = 0; i < allDocs.length; i++) {
 
                     const OVHkeys = getOVHFieldInDocument(allDocs[i]);
@@ -51,6 +54,7 @@ async function DoMigration(pattern) {
                     }
                 }
             }
+            // END
 
             const countOfDocumentFound = await db.collection(collection).countDocuments(finalQuery);
             if (!countOfDocumentFound) {
@@ -68,4 +72,6 @@ async function DoMigration(pattern) {
     }
 }
 
-DoMigration(".ovh.");
+// pattern = string || regex;
+const pattern = "\\.ovh\\." || /\.ovh\./;
+DoMigration(pattern);

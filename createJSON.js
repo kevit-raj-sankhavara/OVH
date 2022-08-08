@@ -19,7 +19,7 @@ async function create_OVH_JSON() {
         let fieldsObj = {};
         for (let i = 0; i < collections.length; i++) {
             console.log(`Writing JSON for collection "${collections[i].name}"`);
-            const documents = db.collection(collections[i].name).find().batchSize(5000);
+            const documents = db.collection(collections[i].name).find().batchSize(10000);
             const set = new Set();
 
             while (await documents.hasNext()) {

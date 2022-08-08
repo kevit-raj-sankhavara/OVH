@@ -23,6 +23,7 @@ function getOVHFieldInDocument(obj) {
 
     return toReturn;
 };
+
 module.exports = getOVHFieldInDocument;
 
 
