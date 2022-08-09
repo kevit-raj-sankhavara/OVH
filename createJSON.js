@@ -12,7 +12,7 @@ async function create_OVH_JSON() {
         return;
     }
 
-    const db = client.db("production-saas-botplatform");
+    const db = client.db("staging-saas-botplatform");
     try {
         const collections = await db.listCollections().toArray();
 

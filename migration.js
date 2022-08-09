@@ -16,7 +16,7 @@ async function DoMigration(pattern) {
     }
 
     try {
-        const db = client.db("production-saas-botplatform");
+        const db = client.db("staging-saas-botplatform");
 
         // Fetching Data from JSON File
         let checkingJSON = fs.readFileSync("Filter.json");
@@ -49,7 +49,7 @@ async function DoMigration(pattern) {
                         const value = OVHkeys[key];
                         const valuesArr = value.split("/");
                         const fileName = valuesArr[valuesArr.length - 1];
-                        const saasUrl = `https://storage.de.cloud.SAAS.net/v1/AUTH_af63bf6fa3884c108ced5661b04a5426/stagcontainer/${fileName}`;
+                        const saasUrl = `https://storage.de.cloud.saas.net/v1/AUTH_af63bf6fa3884c108ced5661b04a5426/stagcontainer/${fileName}`;
                         await db.collection(collection).updateOne({ _id: allDocs[i]._id }, { $set: { [key]: saasUrl } });
                     }
                 }
