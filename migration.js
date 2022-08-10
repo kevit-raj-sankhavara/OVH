@@ -1,8 +1,9 @@
 const MongoClient = require('mongodb').MongoClient;
-const url = 'mongodb://localhost:27017';
+require('dotenv').config()
 const fs = require("fs");
 const getOVHFieldInDocument = require('./getOVHkeys');
 const create_OVH_JSON = require('./createJSON');
+const url = process.env.MONGODB_URL;
 
 async function DoMigration(pattern) {
     // Creating JSON File
@@ -16,10 +17,10 @@ async function DoMigration(pattern) {
     }
 
     try {
-        const db = client.db("staging-saas-botplatform");
+        const db = client.db(process.env.DATABASE);
 
         // Fetching Data from JSON File
-        let checkingJSON = fs.readFileSync("Filter.json");
+        let checkingJSON = fs.readFileSync("./JSONFiles/Filter.json");
         checkingJSON = JSON.parse(checkingJSON);
 
         const checkingQuery = { $regex: pattern, $options: 'i' };
@@ -49,7 +50,9 @@ async function DoMigration(pattern) {
                         const value = OVHkeys[key];
                         const valuesArr = value.split("/");
                         const fileName = valuesArr[valuesArr.length - 1];
-                        const saasUrl = `https://storage.de.cloud.saas.net/v1/AUTH_af63bf6fa3884c108ced5661b04a5426/stagcontainer/${fileName}`;
+                        const saasUrl = `${process.env.NEW_URL}/${fileName}`;
+                        // const saasUrl = `https://storage.de.cloud.saas.net/v1/AUTH_af63bf6fa3884c108ced5661b04a5426/stagcontainer/${fileName}`;
+
                         await db.collection(collection).updateOne({ _id: allDocs[i]._id }, { $set: { [key]: saasUrl } });
                     }
                 }
@@ -72,6 +75,5 @@ async function DoMigration(pattern) {
     }
 }
 
-// pattern = string || regex;
-const pattern = "\\.ovh\\." || /\.ovh\./;
+const pattern = new RegExp(process.env.PATTERN_FOR_DB_QUERY);
 DoMigration(pattern);

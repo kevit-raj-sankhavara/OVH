@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 function getOVHFieldInDocument(obj) {
     let toReturn = {};
 
@@ -11,12 +13,12 @@ function getOVHFieldInDocument(obj) {
 
                 let property = i + '.' + x;
 
-                if (!toReturn.hasOwnProperty(property) && (typeof flatObject[x]) === 'string' && (flatObject[x]).includes(".ovh.")) {
+                if (!toReturn.hasOwnProperty(property) && (typeof flatObject[x]) === 'string' && (flatObject[x]).includes(process.env.PATTERN_FOR_JSON)) {
                     toReturn[property] = flatObject[x];
                 }
             }
         } else {
-            if ((typeof obj[i]) === "string" && obj[i].includes(".ovh."))
+            if ((typeof obj[i]) === "string" && obj[i].includes(process.env.PATTERN_FOR_JSON))
                 toReturn[i] = obj[i];
         }
     }

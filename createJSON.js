@@ -1,8 +1,9 @@
 const MongoClient = require('mongodb').MongoClient;
+require('dotenv').config()
 const fs = require('fs');
-const flattenObject = require('./flatten');
+const getOVHFieldInDocument = require('./getOVHkeys');
+const url = process.env.MONGODB_URL;
 
-const url = 'mongodb://localhost:27017';
 async function create_OVH_JSON() {
     console.log(new Date());
     const client = await MongoClient.connect(url, { useNewUrlParser: true })
@@ -12,7 +13,7 @@ async function create_OVH_JSON() {
         return;
     }
 
-    const db = client.db("staging-saas-botplatform");
+    const db = client.db(process.env.DATABASE);
     try {
         const collections = await db.listCollections().toArray();
 
@@ -24,7 +25,7 @@ async function create_OVH_JSON() {
 
             while (await documents.hasNext()) {
                 const document = await documents.next();
-                const flattenObj = flattenObject(document);
+                const flattenObj = getOVHFieldInDocument(document);
                 const keys = Object.keys(flattenObj)
 
                 keys.forEach(elem => {
@@ -35,7 +36,7 @@ async function create_OVH_JSON() {
             const fieldNames = [...set];
             fieldsObj[collections[i].name] = fieldNames;
             const json = JSON.stringify(fieldsObj);
-            fs.writeFile('Filter.json', json, () => {
+            fs.writeFile('./JSONFiles/Filter.json', json, () => {
                 if (i === collections.length - 1) {
                     console.log(new Date());
                     console.log("JSON file written!!!");

@@ -1,6 +1,7 @@
 const MongoClient = require('mongodb').MongoClient;
-const url = 'mongodb://localhost:27017';
+require('dotenv').config()
 const fs = require('fs');
+const url = process.env.MONGODB_URL;
 
 const filesObj = {};
 
@@ -14,7 +15,7 @@ async function getAllFilesAndCheck() {
     }
 
     try {
-        const db = client.db("staging-saas-botplatform");
+        const db = client.db(process.env.DATABASE);
         const collections = await db.listCollections().toArray();
         for (let i = 0; i < collections.length; i++) {
             console.log(`Getting Files from "${collections[i].name}"`);
